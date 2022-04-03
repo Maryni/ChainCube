@@ -20,7 +20,7 @@ public class CubeValueController : MonoBehaviour
       {
          if (value == values[i])
          {
-            valueReturn = values[i++];
+            valueReturn = values[i+1];  
             continue;
          }
       }
@@ -31,6 +31,11 @@ public class CubeValueController : MonoBehaviour
       }
 
       return valueReturn;
+   }
+
+   public int GetRandomBetweenTwoAndFour()
+   {
+      return values[Random.Range(0, 2)];
    }
    
    public Color32 GetNextColor(Color32 value)
@@ -43,7 +48,7 @@ public class CubeValueController : MonoBehaviour
              value.b == colors[i].b &&
              value.a == colors[i].a)
          {
-            colorReturn = colors[i++];
+            colorReturn = colors[i+1];
             continue;
          }
       }

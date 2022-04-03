@@ -3,21 +3,28 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class ObjectPool : MonoBehaviour
 {
     #region Inspector variables
 
+    [SerializeField] private int countExamples;
     [SerializeField] private GameObject prefab;
     [SerializeField] private Transform transformPool;
     [SerializeField] private List<GameObject> listCreated;
-    [SerializeField] private int countExamples;
 
     #endregion Inspector variables
 
+    #region properties
+
+    public int ListCreatedLength => listCreated.Count;
+
+    #endregion properties
+
     #region Unity functions
 
-    private void Start()
+    private void Awake()
     {
         Init();
     }
@@ -39,6 +46,22 @@ public class ObjectPool : MonoBehaviour
        return findedObject;
     }
 
+    public void SetValuesOnAllCreatedPrefabs(int value)
+    {
+        for (int i = 0; i < listCreated.Count; i++)
+        {
+            listCreated[i].GetComponent<Cube>().SetValue(value);
+        }
+    }
+    
+    public void SetColorsOnAllCreatedPrefabs(Color32 color32)
+    {
+        for (int i = 0; i < listCreated.Count; i++)
+        {
+            listCreated[i].GetComponent<Cube>().SetColor32(color32);
+        }
+    }
+
     #endregion public functions
 
     #region private functions
@@ -49,6 +72,9 @@ public class ObjectPool : MonoBehaviour
         {
             var currectObject = Instantiate(prefab, transformPool);
             listCreated.Add(currectObject);
+            currectObject.SetActive(false);
+            currectObject.GetComponent<Cube>().ChangeCanCollision();
+            currectObject.transform.localPosition = Vector3.zero;
         }
     }
 
