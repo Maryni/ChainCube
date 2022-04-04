@@ -21,7 +21,7 @@ public class CubeValueController : MonoBehaviour
          if (value == values[i])
          {
             valueReturn = values[i+1];  
-            continue;
+            break;
          }
       }
 
@@ -29,7 +29,6 @@ public class CubeValueController : MonoBehaviour
       {
          Debug.LogError($"valueReturn = 0");
       }
-
       return valueReturn;
    }
 
@@ -49,7 +48,7 @@ public class CubeValueController : MonoBehaviour
              value.a == colors[i].a)
          {
             colorReturn = colors[i+1];
-            continue;
+            break;
          }
       }
       

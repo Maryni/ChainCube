@@ -20,12 +20,17 @@ public class Moving : MonoBehaviour
 
     public void MoveForward()
     {
-        rig.velocity = Vector3.forward * speed;
+        rig.AddForce(Vector3.forward * speed,ForceMode.Impulse);
     }
 
     public void MoveUpper()
     {
         rig.velocity = Vector3.up * (speed / 4);
+    }
+
+    public void ResetVelocity()
+    {
+        rig.velocity = Vector3.one;
     }
 
     #endregion public functions

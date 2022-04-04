@@ -19,6 +19,7 @@ public class ObjectPool : MonoBehaviour
     #region properties
 
     public int ListCreatedLength => listCreated.Count;
+    public GameObject LastSpawnedGameObject => listCreated[listCreated.Count - 1];
 
     #endregion properties
 
@@ -35,14 +36,16 @@ public class ObjectPool : MonoBehaviour
 
     public GameObject GetObject()
     {
-       var findedObject =  listCreated.FirstOrDefault(x => !x.activeSelf);
+       var findedObject =  listCreated.FirstOrDefault(x => !x.activeSelf && x.GetComponent<Cube>().Value <= 2);
        if (findedObject == null)
        {
            var newObject = Instantiate(prefab, transformPool);
            listCreated.Add(newObject);
+           ChangeName();
+           newObject.GetComponent<Cube>().ChangeCanCollision();
            return newObject;
        }
-
+       ChangeName();
        return findedObject;
     }
 
@@ -50,7 +53,10 @@ public class ObjectPool : MonoBehaviour
     {
         for (int i = 0; i < listCreated.Count; i++)
         {
-            listCreated[i].GetComponent<Cube>().SetValue(value);
+            if (listCreated[i].GetComponent<Cube>().Value == 0)
+            {
+                listCreated[i].GetComponent<Cube>().SetValue(value);
+            }
         }
     }
     
@@ -58,7 +64,10 @@ public class ObjectPool : MonoBehaviour
     {
         for (int i = 0; i < listCreated.Count; i++)
         {
-            listCreated[i].GetComponent<Cube>().SetColor32(color32);
+            if (listCreated[i].GetComponent<Cube>().Value <= 2)
+            {
+                listCreated[i].GetComponent<Cube>().SetColor32(color32); 
+            }
         }
     }
 
@@ -75,6 +84,14 @@ public class ObjectPool : MonoBehaviour
             currectObject.SetActive(false);
             currectObject.GetComponent<Cube>().ChangeCanCollision();
             currectObject.transform.localPosition = Vector3.zero;
+        }
+    }
+
+    private void ChangeName()
+    {
+        for (int i = 0; i < listCreated.Count; i++)
+        {
+            listCreated[i].name = (i + 1).ToString();
         }
     }
 

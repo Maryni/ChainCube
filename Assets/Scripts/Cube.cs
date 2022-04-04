@@ -8,6 +8,7 @@ public class Cube : MonoBehaviour
 {
     #region Inspector variables
 
+    [SerializeField] private Moving moving;
     [SerializeField] private int value;
     [SerializeField] private Color32 color;
     [SerializeField] private bool isControlling;
@@ -16,8 +17,7 @@ public class Cube : MonoBehaviour
     #endregion Inspector variables
 
     #region private variables
-
-    private Moving moving;
+    
     private UnityAction<int> actionOnCollisionWithParams;
     private UnityAction actionOnCollisionWithoutParams;
     
@@ -28,7 +28,6 @@ public class Cube : MonoBehaviour
     public int Value => value;
     public Color32 Color32 => color;
     public bool IsControlling => isControlling;
-    public bool CanCollision => canCollision;
 
     #endregion properties
 
@@ -37,21 +36,15 @@ public class Cube : MonoBehaviour
     private void OnEnable()
     {
        ChangeCanCollision();
+       StopVelocity();
     }
 
     private void OnDisable()
     {
         ChangeCanCollision();
+        StopVelocity();
     }
 
-    private void Start()
-    {
-        if (moving == null)
-        {
-            moving = GetComponent<Moving>();
-        }
-    }
-    
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.GetComponent<Cube>())
@@ -82,11 +75,11 @@ public class Cube : MonoBehaviour
         SetColorToMaterial();
     }
 
-    public void ChangeCanCollision()
+    public void StopVelocity()
     {
-        canCollision = !canCollision;
+        moving.ResetVelocity();
     }
-
+    
     public void AddActionsOnCollisionWithParams(params UnityAction<int>[] actions)
     {
         for (int i = 0; i < actions.Length; i++)
@@ -100,6 +93,30 @@ public class Cube : MonoBehaviour
         for (int i = 0; i < actions.Length; i++)
         {
             actionOnCollisionWithoutParams += actions[i];
+        }
+    }
+
+    public void ResetAllActions()
+    {
+        actionOnCollisionWithoutParams = null;
+        actionOnCollisionWithParams = null;
+    }
+    
+    public void ChangeCanCollision()
+    {
+        canCollision = !canCollision;
+    }
+
+    public void ChangeIsControlled()
+    {
+        isControlling = !isControlling;
+    }
+
+    public void Move()
+    {
+        if (isControlling)
+        {
+            moving.MoveForward();
         }
     }
     

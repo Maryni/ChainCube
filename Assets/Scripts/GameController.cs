@@ -17,6 +17,8 @@ public class GameController : MonoBehaviour
     private ObjectPool objectPool;
     private CubeValueController cubeValueController;
     private Text scoreText;
+    private Coroutine controlledObjectCoroutine;
+    private Cube currentGameObject;
 
     #endregion private variables
 
@@ -27,15 +29,10 @@ public class GameController : MonoBehaviour
        Init(); 
        SetValuesToSpawnedEnemy();
        SetActionToActions();
+       SetObjectAsControlledObject();
     }
 
     #endregion Unity functions
-    
-    #region public functions
-
-
-
-    #endregion public functions
 
     #region private functions
 
@@ -71,10 +68,7 @@ public class GameController : MonoBehaviour
             var currentCube = objectPool.GetObject().GetComponent<Cube>();
             currentCube.gameObject.SetActive(true); 
             tempList.Add(currentCube);
-            currentCube.AddActionsOnCollisionWithParams(AddScore);
-            currentCube.AddActionsOnCollisionWithoutParams(
-                () => currentCube.SetValue(cubeValueController.GetNextValue(currentCube.Value)),
-                () => currentCube.SetColor32(cubeValueController.GetNextColor(currentCube.Color32)));
+            SetActionToCube(currentCube);
         }
 
         for (int i = 0; i < tempList.Count; i++)
@@ -89,6 +83,43 @@ public class GameController : MonoBehaviour
         var currentTextInt = int.Parse(scoreText.text);
         currentTextInt += value;
         scoreText.text = currentTextInt.ToString();
+    }
+
+    private void SetObjectAsControlledObject()
+    {
+        currentGameObject = objectPool.GetObject().GetComponent<Cube>();
+        SetValuesToSpawnedEnemy();
+        currentGameObject.ChangeIsControlled();
+        currentGameObject.transform.position = playerTransform.position;
+        currentGameObject.gameObject.SetActive(true);
+        //currentGameObject.StopVelocity();
+    }
+
+    private void EnableSetObjectOnDefaultPlaceCoroutine()
+    {
+        if (controlledObjectCoroutine == null)
+        {
+            controlledObjectCoroutine = StartCoroutine(SetObjectAsControlledObjectWithDelay());
+        }
+    }
+    
+    private IEnumerator SetObjectAsControlledObjectWithDelay()
+    {
+        yield return new WaitForSeconds(0.3f);
+        SetObjectAsControlledObject();
+        SetActionToCube(currentGameObject);
+        StopCoroutine(controlledObjectCoroutine);
+        controlledObjectCoroutine = null;
+    }
+
+    private void SetActionToCube(Cube currentCube)
+    {
+        currentCube.ResetAllActions();
+        currentCube.AddActionsOnCollisionWithParams(AddScore);
+        currentCube.AddActionsOnCollisionWithoutParams(
+            () => currentCube.SetValue(cubeValueController.GetNextValue(currentCube.Value)),
+            () => currentCube.SetColor32(cubeValueController.GetNextColor(currentCube.Color32)));
+        currentCube.GetComponent<Drag>().SetActionOnMouseEndDrag(EnableSetObjectOnDefaultPlaceCoroutine);
     }
 
     #endregion private functions
